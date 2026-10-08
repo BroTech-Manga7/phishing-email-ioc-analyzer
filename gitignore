@@ -1,0 +1,17 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Environment / secrets
+.env
+*.key
+*.pem
+api_keys.txt
+
+# Editors
+.vscode/
+
+# OS
+Thumbs.db
+.DS_Store
