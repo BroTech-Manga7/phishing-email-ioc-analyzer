@@ -1,1 +1,189 @@
+Phishing Email & IOC Analyzer — Project Report
+
+Name: Buchule Yani
+Internship: Cyber secrutity
+Project: Project 5 — Phishing & IOC Analyzer
+GitHub: https://github.com/BroTech-Manga7/phishing-email-ioc-analyzer
+
+---
+
+1. Project Objective
+
+The objective of this project is to build a Python tool that analyzes safe sample phishing emails and extracts Indicators of Compromise (IOCs) in a structured way. Phishing emails often contain valuable evidence — suspicious URLs, look-alike domains, IP addresses, hashes, and header mismatches — that must be identified quickly and consistently during incident triage.
+
+This tool automates the first stage of phishing analysis: parsing the email, extracting IOCs, and flagging basic risk indicators — without ever clicking a link, opening an attachment, or contacting any external system.
+
+---
+
+2. Architecture / Lab Setup
+
+Hardware: HP Laptop, Windows 11
+Editor: Visual Studio Code (with Python extension)
+Runtime: Python 3.15.0rc3 (64-bit)
+Analysis Mode: Fully offline / static analysis
+
+Folder Structure
+
+```
+Phishing Email IOC Analyzer/
+├── Scripts/
+│   └── ioc_analyser.py
+├── Sample_Data/
+│   └── sample_phishing_email.eml
+├── Documentation/
+└── README.md
+```
+
+ 
+
+Runtime Environment
+
+ 
+
+
+Analysis Workflow
+
+1. Load — the script locates the .eml file automatically.
+2. Parse — reads raw bytes, splits headers from body.
+3. Extract — regex extracts URLs, domains, IPs, emails, hashes.
+4. Inspect — compares sender vs Reply-To, checks authentication headers.
+5. Analyze — generates risk notes from predefined rules.
+6. Report — prints a structured IOC report.
+
+---
+
+3. Tools Used
+
+Tool Purpose
+Python 3.15 Core programming language
+re module Regex-based IOC pattern matching
+os / sys modules File handling, stdout encoding
+Visual Studio Code Editor and integrated terminal
+Synthetic .eml sample Safe test data (uses .test TLDs only)
+VirusTotal (optional) Reputation enrichment
+
+---
+
+4. Methodology
+
+1. Safe sample selection — a synthetic phishing email was created using only .test domains and documentation IP ranges (185.220.101.45, 192.168.1.100). No real victim emails were used.
+2. Static parsing — the .eml is read as raw bytes and decoded. Headers and body are separated on the first blank line.
+3. Regex extraction — each IOC type has a dedicated compiled regex.
+4. Risk analysis — sender vs Reply-To comparison, SPF/DKIM/DMARC header scanning, TLD reputation checks.
+5. Reporting — results printed to terminal in a structured format.
+
+---
+
+5. Implementation
+
+The tool is a single Python script: Scripts/ioc_analyser.py. Key functions:
+
+Function Purpose
+parse_email(path) Reads .eml, returns (headers, body, full_text)
+unique(items) De-duplicates IOC lists
+find_attachments(text) Detects attachment filenames
+section(title, items) Prints one IOC section
+main() Orchestrates pipeline and printing
+
+Source Code — Key Sections
+
+      
+---
+
+6. Findings
+
+Sample Analyzed
+
+```
+File     : sample_phishing_email.eml
+From     : "PayPal Security" <security@paypal-alerts.test>
+Reply-To : recovery@other-domain.test
+Subject  : Urgent: Your account has been limited
+```
+
+Extracted IOCs
+
+URLs (2)
+
+· http://paypal-alerts.test/login/verify?user=victim
+· http://secure-paypal.example.test/confirm
+
+Domains (7) — paypal-alerts.test, other-domain.test, example.test, mail.paypal-alerts.test, mx.example.test, paypal-alerts.testlogin, secure-paypal.example.test
+
+IPv4 Addresses (2)
+
+· 185.220.101.45 (external attacker infra)
+· 192.168.1.100 (internal decoy)
+
+Email Addresses (6) — including security@paypal-alerts.test, recovery@other-domain.test, victim@example.test, abc123@paypal-alerts.test, support@paypal-alerts.test, backup@other-domain.test
+
+Hashes
+
+· MD5: 5d41402abc4b2a76b9719d911017c592
+· SHA256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+
+Attachments: none detected
+
+Risk Notes (4)
+
+1. Sender / Reply-To mismatch (possible impersonation)
+2. Authentication-Results failure (SPF/DKIM/DMARC)
+3. Suspicious TLD: paypal-alerts.test
+4. 2 URL(s) present — verify before clicking
+
+---
+
+7. Screenshots / Evidence
+
+Analyzer Terminal Output
+
+   
+
+---
+
+8. MITRE ATT&CK Mapping
+
+Observed Behavior MITRE Technique ID
+Email with embedded malicious link Phishing: Spearphishing Link T1566.002
+Email with attachment reference Phishing: Spearphishing Attachment T1566.001
+Impersonation via Reply-To mismatch Masquerading T1036
+Look-alike domain Acquire Infrastructure: Domains T1583.001
+
+Primary classification: T1566 — Phishing
+
+---
+
+9. Remediation
+
+· Block paypal-alerts.test and other-domain.test at DNS/proxy
+· Add 185.220.101.45 to block lists after reputation check
+· Enforce DMARC p=reject, SPF and DKIM on company domains
+· Enable advanced phishing protection on the mail gateway
+· Train users to check Reply-To and hover over links
+· Alert on Reply-To ≠ From mismatches and suspicious TLDs
+
+---
+
+10. Lessons Learned
+
+· Regex is powerful but limited — matches are evidence, not proof of malice
+· Static analysis is safer than dynamic — never open links or attachments
+· Header anomalies (Reply-To mismatch + SPF fail) are strong phishing signals
+· Python's standard library covers a complete analyzer without dependencies
+· Documentation matters — findings, evidence and remediation are part of the deliverable
+
+---
+
+Appendix — IOC Summary Table
+
+IOC Type Action
+paypal-alerts.test/login/verify URL Investigate / block
+paypal-alerts.test Domain Reputation check
+other-domain.test Domain Investigate
+Sender/Reply-To mismatch Header Verify sender
+SPF/DKIM/DMARC fail Header Quarantine
+185.220.101.45 IP Reputation / block
+MD5 / SHA256 Hash Cross-check VT
+
+
 
